@@ -1,0 +1,44 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=swaylock-waypure
+pkgver=1.8.3
+pkgrel=1
+pkgdesc="Screen locker for Wayland"
+arch=('x86_64')
+url="https://github.com/swaywm/swaylock"
+license=('MIT')
+depends=('cairo' 'gdk-pixbuf2' 'glib2' 'libxkbcommon' 'pam' 'wayland')
+makedepends=('meson' 'scdoc' 'wayland-protocols')
+provides=('swaylock')
+conflicts=('swaylock')
+replaces=('swaylock')
+source=("$url/releases/download/v$pkgver/${pkgname%%-*}-$pkgver.tar.gz")
+sha256sums=('c9edc022cefc84d5762df9e480eed16627776897def52d630c0348de53f04f94')
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    --auto-features=disabled
+    -Dstrip=true
+    -Db_lto=true
+    -Db_ndebug=true
+
+    -Dpam=enabled
+    -Dgdk-pixbuf=enabled
+    -Dman-pages=enabled
+    -Dzsh-completions=false
+    -Dbash-completions=true
+    -Dfish-completions=false
+  )
+
+  arch-meson "${pkgname%%-*}-$pkgver" build "${_meson_options[@]}"
+
+  meson compile -C build
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+  install -Dm644 "${pkgname%%-*}-$pkgver/LICENSE" -t "$pkgdir/usr/share/licenses/$pkgname"
+  install -Dm644 "${pkgname%%-*}-$pkgver/README.md" -t "$pkgdir/usr/share/doc/$pkgname"
+}
