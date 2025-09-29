@@ -1,0 +1,44 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=swayidle-waypure
+pkgver=1.8.0
+pkgrel=1
+pkgdesc="Idle management daemon for Wayland without fish/zsh completions"
+arch=('x86_64')
+url="https://github.com/swaywm/swayidle"
+license=('MIT')
+depends=('systemd-libs' 'wayland')
+makedepends=('meson' 'scdoc' 'wayland-protocols')
+provides=('swayidle')
+conflicts=('swayidle')
+replaces=('swayidle')
+source=("$url/releases/download/$pkgver/${pkgname%%-*}-$pkgver.tar.gz")
+sha256sums=('16b3e76a117f2f0ff2ee5fbebf38849595cdd705db1cd5f6aceaed00d71b3aa1')
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    --auto-features=disabled
+    -Dstrip=true
+    -Db_lto=true
+    -Db_ndebug=true
+
+    -Dman-pages=enabled
+    -Dlogind=enabled
+    -Dlogind-provider=systemd
+    -Dzsh-completions=false
+    -Dbash-completions=true
+    -Dfish-completions=false
+  )
+
+  arch-meson "${pkgname%%-*}-$pkgver" build "${_meson_options[@]}"
+
+  meson compile -C build
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+  install -Dm644 "${pkgname%%-*}-$pkgver/LICENSE" -t "$pkgdir/usr/share/licenses/$pkgname"
+  install -Dm644 "${pkgname%%-*}-$pkgver/README.md" -t "$pkgdir/usr/share/doc/$pkgname"
+}
