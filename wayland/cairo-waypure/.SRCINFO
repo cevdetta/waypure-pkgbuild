@@ -1,0 +1,25 @@
+pkgbase = cairo-waypure
+	pkgdesc = 2D graphics library with support for multiple output devices (Wayland only)
+	pkgver = 1.18.4
+	pkgrel = 1
+	url = https://gitlab.freedesktop.org/cairo/cairo
+	arch = x86_64
+	license = LGPL-2.1-only OR MPL-1.1
+	makedepends = meson
+	depends = bash
+	depends = fontconfig
+	depends = freetype2
+	depends = glib2
+	depends = libpng
+	depends = lzo
+	depends = pixman
+	provides = cairo
+	provides = libcairo.so
+	provides = libcairo-gobject.so
+	provides = libcairo-script-interpreter.so
+	conflicts = cairo
+	replaces = cairo
+	source = https://gitlab.freedesktop.org/cairo/cairo/-/archive/1.18.4/cairo-1.18.4.tar.gz
+	sha256sums = 2f3e6e665dbbb420809102b71ad7d0f7ce870a0b1bf8b34c073f06aefb511fc6
+
+pkgname = cairo-waypure

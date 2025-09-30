@@ -1,0 +1,58 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=cairo-waypure
+pkgver=1.18.4
+pkgrel=1
+pkgdesc="2D graphics library with support for multiple output devices (Wayland only)"
+arch=('x86_64')
+url="https://gitlab.freedesktop.org/cairo/cairo"
+license=('LGPL-2.1-only OR MPL-1.1')
+depends=('bash' 'fontconfig' 'freetype2' 'glib2' 'libpng' 'lzo' 'pixman')
+makedepends=('meson')
+provides=('cairo' 'libcairo.so' 'libcairo-gobject.so' 'libcairo-script-interpreter.so')
+conflicts=('cairo')
+replaces=('cairo')
+source=("$url/-/archive/$pkgver/${pkgname%%-*}-$pkgver.tar.gz")
+sha256sums=('2f3e6e665dbbb420809102b71ad7d0f7ce870a0b1bf8b34c073f06aefb511fc6')
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    --auto-features=disabled
+    -Dstrip=true
+    -Db_lto=true
+    -Db_ndebug=true
+
+    -Ddwrite=disabled
+    -Dfontconfig=enabled
+    -Dfreetype=enabled
+
+    -Dpng=enabled
+    -Dquartz=disabled
+    -Dtee=disabled
+    -Dxcb=disabled
+    -Dxlib=disabled
+    -Dxlib-xcb=disabled
+    -Dzlib=enabled
+
+    -Dtests=disabled
+
+    -Dlzo=enabled
+    -Dgtk2-utils=disabled
+
+    -Dglib=enabled
+    -Dspectre=disabled
+    -Dsymbol-lookup=disabled
+
+    -Dgtk_doc=false
+  )
+
+  arch-meson "${pkgname%%-*}-$pkgver" build "${_meson_options[@]}"
+
+  meson compile -C build
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+}
