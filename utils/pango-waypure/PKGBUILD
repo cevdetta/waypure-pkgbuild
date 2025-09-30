@@ -1,0 +1,47 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=pango-waypure
+pkgver=1.57.0
+pkgrel=1
+pkgdesc="A library for layout and rendering of text (Wayland only)"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/pango"
+license=('LGPL-2.1-or-later')
+depends=('cairo' 'freetype2' 'fribidi' 'fontconfig' 'glib2' 'harfbuzz')
+makedepends=('glib2-devel' 'gobject-introspection' 'meson')
+provides=('pango' 'libpango-1.0.so' 'libpangocairo-1.0.so' 'libpangoft2-1.0.so')
+conflicts=('pango')
+replaces=('pango')
+source=("$url/-/archive/$pkgver/${pkgname%%-*}-$pkgver.tar.gz")
+sha256sums=('1b2e2f683dfb5adec3faf17087ade8c648f10a5d3d0e17e421e0ac1a39e6740e')
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    --auto-features=disabled
+    -Dstrip=true
+    -Db_lto=true
+    -Db_ndebug=true
+
+    -Ddocumentation=false
+    -Dman-pages=false
+    -Dintrospection=enabled
+    -Dbuild-testsuite=false
+    -Dbuild-examples=false
+    -Dfontconfig=enabled
+    -Dsysprof=disabled
+    -Dlibthai=disabled
+    -Dcairo=enabled
+    -Dxft=disabled
+    -Dfreetype=enabled
+  )
+
+  arch-meson "${pkgname%%-*}-$pkgver" build "${_meson_options[@]}"
+
+  meson compile -C build
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+}

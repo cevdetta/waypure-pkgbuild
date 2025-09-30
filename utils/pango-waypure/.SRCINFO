@@ -1,0 +1,26 @@
+pkgbase = pango-waypure
+	pkgdesc = A library for layout and rendering of text (Wayland only)
+	pkgver = 1.57.0
+	pkgrel = 1
+	url = https://gitlab.gnome.org/GNOME/pango
+	arch = x86_64
+	license = LGPL-2.1-or-later
+	makedepends = glib2-devel
+	makedepends = gobject-introspection
+	makedepends = meson
+	depends = cairo
+	depends = freetype2
+	depends = fribidi
+	depends = fontconfig
+	depends = glib2
+	depends = harfbuzz
+	provides = pango
+	provides = libpango-1.0.so
+	provides = libpangocairo-1.0.so
+	provides = libpangoft2-1.0.so
+	conflicts = pango
+	replaces = pango
+	source = https://gitlab.gnome.org/GNOME/pango/-/archive/1.57.0/pango-1.57.0.tar.gz
+	sha256sums = 1b2e2f683dfb5adec3faf17087ade8c648f10a5d3d0e17e421e0ac1a39e6740e
+
+pkgname = pango-waypure
