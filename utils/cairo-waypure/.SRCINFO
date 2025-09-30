@@ -13,6 +13,7 @@ pkgbase = cairo-waypure
 	depends = libpng
 	depends = lzo
 	depends = pixman
+	depends = zlib
 	provides = cairo
 	provides = libcairo.so
 	provides = libcairo-gobject.so
