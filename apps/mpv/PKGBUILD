@@ -1,0 +1,72 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=mpv-waypure
+pkgver=0.40.0
+pkgrel=1
+pkgdesc="a free, open source, and cross-platform media player (only Wayland, Vulkan, vaapi)"
+arch=('x86_64')
+url="https://github.com/mpv-player/mpv"
+license=('GPL-2.0-or-later AND LGPL-2.1-or-later')
+depends=('bash' 'ffmpeg' 'gcc-libs' 'hicolor-icon-theme' 'lcms2' 'libarchive' 'libass' 'libjpeg-turbo' 'libpipewire' 'libplacebo' 'libva' 'libxkbcommon' 'luajit' 'uchardet' 'vulkan-icd-loader' 'wayland' 'zimg' 'zlib')
+makedepends=('meson' 'python-docutils' 'vulkan-headers' 'wayland-protocols')
+optdepends=('yt-dlp: for video-sharing websites playback')
+provides=('libmpv.so' 'mpv')
+conflicts=('libmpv.so' 'mpv')
+replaces=('mpv')
+source=("${url}/archive/v${pkgver}/${pkgname%%-*}-${pkgver}.tar.gz")
+sha256sums=('10a0f4654f62140a6dd4d380dcf0bbdbdcf6e697556863dc499c296182f081a3')
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    --auto-features=disabled
+    -Dstrip=true
+    -Db_lto=true
+    -Db_ndebug=true
+
+    -Dbuild-date=false
+
+    -Dcplugins=enabled
+    -Diconv=enabled
+    -Djpeg=enabled
+    -Dlcms2=enabled
+    -Dlibarchive=enabled
+    -Dlibavdevice=enabled
+    -Dlua=luajit
+    -Duchardet=enabled
+    -Dvector=enabled
+    -Dzimg=enabled
+    -Dzlib=enabled
+
+    -Dpipewire=enabled
+
+    -Dgl=disabled
+    -Dvaapi=enabled
+    -Dvaapi-wayland=enabled
+    -Dvulkan=enabled
+    -Dwayland=enabled
+
+    -Dmanpage-build=enabled
+  )
+
+  arch-meson "${pkgname%%-*}-$pkgver" build "${_meson_options[@]}"
+
+  meson compile -C build
+}
+
+check() {
+  meson test -C build --print-errorlogs
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+  # delete private entries only required for static linking
+  sed -i -e '/Requires.private/d' -e '/Libs.private/d' "${pkgdir}"/usr/lib/pkgconfig/mpv.pc
+
+  install -m0644 "${pkgname%%-*}-${pkgver}"/DOCS/{encoding.rst,tech-overview.txt} \
+    "${pkgdir}"/usr/share/doc/mpv
+
+  install -m0644 "${pkgname%%-*}-${pkgver}"/TOOLS/{umpv,mpv_identify.sh,stats-conv.py,idet.sh,lua/*} \
+    -D -t "${pkgdir}"/usr/share/mpv/scripts
+}
