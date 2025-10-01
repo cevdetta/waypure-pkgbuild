@@ -9,7 +9,7 @@ arch=('x86_64')
 url="https://gitlab.gnome.org/GNOME/at-spi2-core"
 license=('LGPL-2.1-or-later')
 depends=('dbus' 'gcc-libs' 'glib2' 'systemd-libs')
-makedepends=('glib2-devel' 'gobject-introspection' 'libxml2' 'meson' 'systemd')
+makedepends=('glib2-devel' 'meson' 'systemd')
 provides=('at-spi2-core' 'libatk-1.0.so' 'libatk-bridge-2.0.so' 'libatspi.so')
 conflicts=('at-spi2-core')
 replaces=('at-spi2-core')
@@ -28,7 +28,7 @@ build() {
     -Duse_systemd=true
     -Dgtk2_atk_adaptor=false
     -Ddocs=false
-    -Dintrospection=enabled
+    -Dintrospection=disabled
     -Dx11=disabled
     -Datk_only=false
   )
