@@ -1,0 +1,46 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=libepoxy-waypure
+pkgver=1.5.10
+pkgrel=1
+pkgdesc="Library handling OpenGL function pointer management (Wayland only)"
+arch=('x86_64')
+url="https://github.com/anholt/libepoxy"
+license=('MIT')
+depends=('glibc' 'libglvnd')
+makedepends=('mesa-libgl' 'meson')
+provides=('libepoxy' 'libepoxy.so')
+conflicts=('libepoxy')
+replaces=('libepoxy')
+source=("$url/archive/refs/tags/$pkgver.tar.gz")
+sha256sums=('a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15')
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    --auto-features=disabled
+    -Dstrip=true
+    -Db_lto=true
+    -Db_ndebug=true
+
+    -Ddocs=false
+    -Dglx=no
+    -Degl=yes
+    -Dx11=false
+    -Dtests=false
+  )
+
+  arch-meson "${pkgname%%-*}-$pkgver" build "${_meson_options[@]}"
+
+  meson compile -C build
+}
+
+check() {
+  meson test -C build --print-errorlogs
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+  install -Dm644 "${pkgname%%-*}-$pkgver/COPYING" -t "$pkgdir/usr/share/licenses/$pkgname"
+}

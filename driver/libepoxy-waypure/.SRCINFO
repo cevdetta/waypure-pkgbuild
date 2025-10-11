@@ -1,0 +1,19 @@
+pkgbase = libepoxy-waypure
+	pkgdesc = Library handling OpenGL function pointer management (Wayland only)
+	pkgver = 1.5.10
+	pkgrel = 1
+	url = https://github.com/anholt/libepoxy
+	arch = x86_64
+	license = MIT
+	makedepends = mesa-libgl
+	makedepends = meson
+	depends = glibc
+	depends = libglvnd
+	provides = libepoxy
+	provides = libepoxy.so
+	conflicts = libepoxy
+	replaces = libepoxy
+	source = https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar.gz
+	sha256sums = a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15
+
+pkgname = libepoxy-waypure
