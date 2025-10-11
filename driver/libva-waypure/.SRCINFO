@@ -1,0 +1,25 @@
+pkgbase = libva-waypure
+	pkgdesc = Video Acceleration (VA) API for Linux (Wayland Only)
+	pkgver = 2.22.0
+	pkgrel = 1
+	url = https://github.com/intel/libva
+	arch = x86_64
+	license = MIT
+	makedepends = meson
+	makedepends = wayland-protocols
+	depends = glibc
+	depends = libdrm
+	depends = wayland
+	optdepends = intel-media-driver: backend for Intel GPUs (>= Broadwell)
+	optdepends = libva-intel-driver: backend for Intel GPUs (<= Haswell)
+	optdepends = libva-mesa-driver: backend for AMD and NVIDIA GPUs
+	provides = libva
+	provides = libva.so
+	provides = libva-drm.so
+	provides = libva-wayland.so
+	conflicts = libva
+	replaces = libva
+	source = https://github.com/intel/libva/releases/download/2.22.0/libva-2.22.0.tar.bz2
+	sha256sums = e3da2250654c8d52b3f59f8cb3f3d8e7fb1a2ee64378dbc400fbc5663de7edb8
+
+pkgname = libva-waypure
