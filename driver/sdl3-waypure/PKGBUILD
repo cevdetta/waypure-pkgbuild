@@ -1,0 +1,123 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=sdl3-waypure
+pkgver=3.2.24
+pkgrel=1
+pkgdesc="A library for portable low-level access to a video framebuffer, audio output, mouse, and keyboard (version 3)"
+arch=('x86_64')
+url="https://github.com/libsdl-org/SDL"
+license=('Zlib')
+depends=('glibc' 'libglvnd' 'libpipewire' 'libusb' 'libxkbcommon' 'wayland')
+makedepends=('cmake' 'ninja' 'vulkan-headers' 'wayland-protocols')
+optdepends=(
+  'pipewire: PipeWire audio driver'
+  'vulkan-driver: vulkan renderer'
+)
+provides=('sdl3')
+conflicts=('sdl3')
+replaces=('sdl3')
+source=("$url/releases/download/release-${pkgver}/SDL3-${pkgver}.tar.gz")
+sha256sums=('81cc0fc17e5bf2c1754eeca9af9c47a76789ac5efdd165b3b91cbbe4b90bfb76')
+
+build() {
+  CFLAGS+=" -ffat-lto-objects"
+
+  local _cmake_args=(
+    -DCMAKE_BUILD_TYPE=Release
+    -B build -G Ninja
+  	-D CMAKE_BUILD_TYPE=None
+    -D CMAKE_INSTALL_PREFIX=/usr
+
+		-DSDL_ASSERTIONS=disabled  # auto/disabled/release/enabled/paranoid
+		# -DSDL_ASSEMBLY=
+		# -DSDL_AVX=
+		# -DSDL_AVX2=
+		# -DSDL_AVX512F=
+		# -DSDL_SSE=
+		# -DSDL_SSE2=
+		# -DSDL_SSE3=
+		# -DSDL_SSE4_1=
+		# -DSDL_SSE4_2=
+		# -DSDL_MMX=
+		# -DSDL_ALTIVEC=
+		# -DSDL_ARMNEON
+		# -DSDL_LSX
+
+		-DSDL_DLOPEN_NOTES=OFF       # "Record dlopen dependencies in .note.dlopen section" TRUE UNIX_SYS OFF)
+    -DSDL_LIBC=ON                # "Use the system C library" ${SDL_LIBC_DEFAULT})
+    -DSDL_SYSTEM_ICONV=ON        # "Use iconv() from system-installed libraries" ${SDL_SYSTEM_ICONV_DEFAULT})
+    -DSDL_LIBICONV=OFF           # "Prefer iconv() from libiconv, if available, over libc version" OFF)
+    -DSDL_GCC_ATOMICS=ON         # "Use gcc builtin atomics" ${SDL_GCC_ATOMICS_DEFAULT})
+    -DSDL_DBUS=ON                # "Enable D-Bus support" ON "${UNIX_SYS}" OFF)
+    -DSDL_LIBURING=ON            # "Enable liburing support" ON "${UNIX_SYS}" OFF)
+    # -DSDL_DISKAUDIO            # "Support the disk writer audio driver" ON "SDL_AUDIO" OFF)
+    # -DSDL_DUMMYAUDIO           # "Support the dummy audio driver" ON "SDL_AUDIO" OFF)
+    # -DSDL_DUMMYVIDEO           # "Use dummy video driver" ON "SDL_VIDEO" OFF)
+    # -DSDL_IBUS                 # "Enable IBus support" ON "${UNIX_SYS}" OFF)
+    -DSDL_OPENGL=ON              # "Include OpenGL support" ON "SDL_VIDEO;NOT IOS;NOT VISIONOS;NOT TVOS;NOT WATCHOS" OFF)
+    -DSDL_OPENGLES=ON            # "Include OpenGL ES support" ON "SDL_VIDEO;NOT VISIONOS;NOT TVOS;NOT WATCHOS" OFF)
+    -DSDL_PTHREADS=ON            # "Use POSIX threads for multi-threading" ${SDL_PTHREADS_DEFAULT})
+    -DSDL_PTHREADS_SEM=ON        # "Use pthread semaphores" ON "SDL_PTHREADS" OFF)
+    -DSDL_OSS=OFF                # "Support the OSS audio API" ${SDL_OSS_DEFAULT} "UNIX_SYS OR RISCOS;SDL_AUDIO" OFF)
+    -DSDL_ALSA=OFF               # "Support the ALSA audio API" ${UNIX_SYS} "SDL_AUDIO" OFF)
+    -DSDL_JACK=OFF               # "Support the JACK audio API" ${UNIX_SYS} "SDL_AUDIO" OFF)
+    -DSDL_PIPEWIRE=ON            # "Use Pipewire audio" ${UNIX_SYS})
+    -DSDL_PULSEAUDIO=OFF         # "Use PulseAudio" ${UNIX_SYS} "SDL_AUDIO" OFF)
+    -DSDL_SNDIO=OFF              # "Support the sndio audio API" ${UNIX_SYS} "SDL_AUDIO" OFF)
+    -DSDL_RPATH=OFF              # "Use an rpath when linking SDL" ${SDL_RPATH_DEFAULT})
+    -DSDL_CLOCK_GETTIME=ON       # "Use clock_gettime() instead of gettimeofday()" ${SDL_CLOCK_GETTIME_DEFAULT})
+    -DSDL_X11=OFF                # "Use X11 video driver" ${UNIX_SYS} "SDL_VIDEO" OFF)
+    -DSDL_WAYLAND=ON             # "Use Wayland video driver" ${UNIX_SYS} "SDL_VIDEO" OFF)
+    -DSDL_WAYLAND_LIBDECOR=OFF   # "Use client-side window decoratiONs ON Wayland" ON "SDL_WAYLAND" OFF)
+    -DSDL_RPI=OFF                # "Use Raspberry Pi video driver" ON "SDL_VIDEO;UNIX_SYS;SDL_CPU_ARM32 OR SDL_CPU_ARM64" OFF)
+    -DSDL_ROCKCHIP=OFF           # "Use ROCKCHIP Hardware AcceleratiON video driver" ON "SDL_VIDEO;UNIX_SYS;SDL_CPU_ARM32 OR SDL_CPU_ARM64" OFF)
+    -DSDL_COCOA=OFF              # "Use Cocoa video driver" ON "APPLE" OFF)
+    -DSDL_DIRECTX=OFF            # "Use DirectX for Windows audio/video" ON "SDL_AUDIO OR SDL_VIDEO;WINDOWS" OFF)
+    -DSDL_XINPUT=OFF             # "Use Xinput for Windows" ON "WINDOWS" OFF)
+    -DSDL_WASAPI=OFF             # "Use the Windows WASAPI audio driver" ON "WINDOWS;SDL_AUDIO" OFF)
+    -DSDL_RENDER_METAL=OFF       # "Enable the Metal render driver" ON "SDL_RENDER;APPLE" OFF)
+    -DSDL_RENDER_GPU=OFF         # "Enable the SDL_GPU render driver" ON "SDL_RENDER;SDL_GPU" OFF)
+    -DSDL_VIVANTE=OFF            # "Use Vivante EGL video driver" ON "${UNIX_SYS};SDL_CPU_ARM32" OFF)
+    -DSDL_VULKAN=ON              # "Enable Vulkan support" ON "SDL_VIDEO;ANDROID OR APPLE OR LINUX OR FREEBSD OR WINDOWS" OFF)
+    -DSDL_RENDER_VULKAN=ON       # "Enable the Vulkan render driver" ON "SDL_RENDER;SDL_VULKAN" OFF)
+    -DSDL_METAL=OFF              # "Enable Metal support" ON "APPLE" OFF)
+    -DSDL_OPENVR=OFF             #  "Use OpenVR video driver" OFF)
+    -DSDL_KMSDRM=OFF             #    "Use KMS DRM video driver" ${UNIX_SYS} "SDL_VIDEO" OFF)
+    -DSDL_OFFSCREEN=ON           # "Use OFFscreen video driver" ON)
+    # -DSDL_DUMMYCAMERA          # "Support the dummy camera driver" ON SDL_CAMERA OFF)
+    # -DSDL_BACKGROUNDING_SIGNAL # "number to use for magic backgrounding signal or 'OFF'" OFF)
+    # -DSDL_FOREGROUNDING_SIGNAL # "number to use for magic foregrounding signal or 'OFF'" OFF)
+    # -DSDL_HIDAPI              # "Enable the HIDAPI subsystem" ON "NOT VISIONOS" OFF)
+    # -DSDL_HIDAPI_LIBUSB       # "Use libusb for low level joystick drivers" ON SDL_HIDAPI_LIBUSB_AVAILABLE OFF)
+    # -DSDL_HIDAPI_JOYSTICK     # "Use HIDAPI for low level joystick drivers" ON SDL_HIDAPI OFF)
+    # -DSDL_VIRTUAL_JOYSTICK    # "Enable the virtual-joystick driver" ON SDL_HIDAPI OFF)
+    -DSDL_LIBUDEV=ON            # "Enable libudev support" ON)
+    -DSDL_ASAN=OFF              # "Use AddressSanitizer to detect memory errors" OFF)
+    -DSDL_CCACHE=OFF            # "Use Ccache to speed up build" OFF)
+    -DSDL_CLANG_TIDY=OFF        # "Run clang-tidy static analysis" OFF)
+
+    #-DSDL_VENDOR_INFO          # "" CACHE STRING "Vendor name and/or version to add to SDL_REVISION")
+
+    -DSDL_DEPS_SHARED=OFF       # link rather than dlopen() where possible
+    -DSDL_SHARED=ON             # "Build a shared version of the library" ${SDL_SHARED_DEFAULT} ${SDL_SHARED_AVAILABLE} OFF)
+    -DSDL_STATIC=OFF            # "Build a static version of the library" ${SDL_STATIC_DEFAULT} ${SDL_STATIC_AVAILABLE} OFF)
+    -DSDL_TEST_LIBRARY=OFF      # "Build the SDL3_test library" ON)
+
+    -DSDL_TESTS=OFF             # "Build the test directory" OFF SDL_TEST_LIBRARY OFF)
+    -DSDL_INSTALL_TESTS=OFF     # "Install test-cases" OFF "SDL_INSTALL;NOT SDL_FRAMEWORK" OFF)
+    -DSDL_TESTS_LINK_SHARED=OFF # "link tests to shared SDL library" "${SDL_SHARED}" "SDL_SHARED;SDL_STATIC" "${SDL_SHARED}")
+    #-DSDL_TESTS_TIMEOUT_MULTIPLIER=1 "1" CACHE STRING "Timeout multiplier to account for really slow machines")
+
+    -DSDL_EXAMPLES=OFF          # "Build the examples directory")
+	)
+
+  cmake -S SDL3-${pkgver} "${_cmake_args[@]}"
+  cmake --build build
+}
+
+package() {
+  DESTDIR="${pkgdir}" cmake --install build
+
+  install -Dm644 SDL3-${pkgver}/LICENSE.txt "$pkgdir/usr/share/licenses/SDL3/LICENSE"
+}
