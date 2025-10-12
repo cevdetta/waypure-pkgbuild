@@ -1,6 +1,6 @@
 pkgbase = at-spi2-core-waypure
 	pkgdesc = Protocol definitions and daemon for D-Bus at-spi (Wayland only)
-	pkgver = 2.58.0
+	pkgver = 2.58.1
 	pkgrel = 1
 	url = https://gitlab.gnome.org/GNOME/at-spi2-core
 	arch = x86_64
@@ -18,7 +18,7 @@ pkgbase = at-spi2-core-waypure
 	provides = libatspi.so
 	conflicts = at-spi2-core
 	replaces = at-spi2-core
-	source = https://gitlab.gnome.org/GNOME/at-spi2-core/-/archive/2.58.0/at-spi2-core-2.58.0.tar.gz
-	sha256sums = e91034e47bc3239c55863077d4668f62344962c90e43ee10706630f66be0fffe
+	source = https://gitlab.gnome.org/GNOME/at-spi2-core/-/archive/2.58.1/at-spi2-core-2.58.1.tar.gz
+	sha256sums = 780544354db3f6b3e4cc0c6dcdf3bfbaac93970a7a1e7e659f24c7308e2b0a1a
 
 pkgname = at-spi2-core-waypure

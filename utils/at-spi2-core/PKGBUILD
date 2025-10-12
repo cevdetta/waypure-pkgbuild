@@ -2,7 +2,7 @@
 # Contributor: cevdetta
 
 pkgname=at-spi2-core-waypure
-pkgver=2.58.0
+pkgver=2.58.1
 pkgrel=1
 pkgdesc="Protocol definitions and daemon for D-Bus at-spi (Wayland only)"
 arch=('x86_64')
@@ -14,7 +14,7 @@ provides=('at-spi2-core' 'libatk-1.0.so' 'libatk-bridge-2.0.so' 'libatspi.so')
 conflicts=('at-spi2-core')
 replaces=('at-spi2-core')
 source=("$url/-/archive/$pkgver/at-spi2-core-$pkgver.tar.gz")
-sha256sums=('e91034e47bc3239c55863077d4668f62344962c90e43ee10706630f66be0fffe')
+sha256sums=('780544354db3f6b3e4cc0c6dcdf3bfbaac93970a7a1e7e659f24c7308e2b0a1a')
 
 build() {
   local _meson_options=(
