@@ -1,0 +1,57 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=libglvnd-waypure
+pkgver=1.7.0
+pkgrel=1
+pkgdesc="The GL Vendor-Neutral Dispatch library"
+arch=('x86_64')
+url="https://gitlab.freedesktop.org/glvnd/libglvnd"
+license=('custom:BSD-like')
+depends=('glibc')
+makedepends=('meson' 'python')
+optdepends=(
+  'mesa: free OpenGL implementation (EGL, GLES, GL)'
+)
+provides=('libglvnd' 'libgl' 'libegl' 'libgles' 'libopengl')
+conflicts=('libglvnd')
+replaces=('libglvnd')
+source=(
+  "$url/-/archive/v$pkgver/${pkgname%%-*}-v$pkgver.tar.gz"
+  'license-from-upstream'
+)
+sha256sums=(
+  '2b6e15b06aafb4c0b6e2348124808cbd9b291c647299eaaba2e3202f51ff2f3d' 'c1b5df2985891204e17c2da0cd21e7017283311e2f1912937c201d1f981fffe1'
+)
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    --auto-features=disabled
+    -Dstrip=true
+    -Db_lto=true
+    -Db_ndebug=true
+
+    -Dasm=enabled
+    -Dx11=disabled
+    -Degl=true
+    -Dglx=disabled
+    -Dhgl=false
+    -Dgles1=false
+    -Dgles2=true
+    -Dtls=true
+    -Ddispatch-tls=true
+    -Ddispatch-page-size=0
+    -Dheaders=true
+    -Dentrypoint-patching=disabled
+  )
+
+  arch-meson "${pkgname%%-*}-v$pkgver" build "${_meson_options[@]}"
+
+  meson compile -C build
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+  install -Dm644 license-from-upstream "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}

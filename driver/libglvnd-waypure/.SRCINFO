@@ -1,0 +1,24 @@
+pkgbase = libglvnd-waypure
+	pkgdesc = The GL Vendor-Neutral Dispatch library
+	pkgver = 1.7.0
+	pkgrel = 1
+	url = https://gitlab.freedesktop.org/glvnd/libglvnd
+	arch = x86_64
+	license = custom:BSD-like
+	makedepends = meson
+	makedepends = python
+	depends = glibc
+	optdepends = mesa: free OpenGL implementation (EGL, GLES, GL)
+	provides = libglvnd
+	provides = libgl
+	provides = libegl
+	provides = libgles
+	provides = libopengl
+	conflicts = libglvnd
+	replaces = libglvnd
+	source = https://gitlab.freedesktop.org/glvnd/libglvnd/-/archive/v1.7.0/libglvnd-v1.7.0.tar.gz
+	source = license-from-upstream
+	sha256sums = 2b6e15b06aafb4c0b6e2348124808cbd9b291c647299eaaba2e3202f51ff2f3d
+	sha256sums = c1b5df2985891204e17c2da0cd21e7017283311e2f1912937c201d1f981fffe1
+
+pkgname = libglvnd-waypure
