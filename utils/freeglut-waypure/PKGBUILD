@@ -1,0 +1,69 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=freeglut-waypure
+pkgver=3.6.0
+pkgrel=1
+pkgdesc="Free OpenGL Utility Toolkit"
+arch=('x86_64')
+url="https://github.com/FreeGLUTProject/freeglut"
+license=('X11')
+depends=('glibc' 'libglvnd' 'libxkbcommon' 'wayland')
+makedepends=('cmake' 'glu' 'mesa' 'ninja')
+provides=('freeglut' 'glut')
+conflicts=('freeglut' 'glut')
+replaces=('freeglut' 'glut')
+source=(
+  "$url/releases/download/v$pkgver/${pkgname%%-*}-$pkgver.tar.gz"
+  '2294389397912c9a6505a88221abb7dca0a4fb79.patch'
+  '800772e993a3ceffa01ccf3fca449d3279cde338.patch'
+)
+sha256sums=(
+  '9c3d4d6516fbfa0280edc93c77698fb7303e443c1aaaf37d269e3288a6c3ea52'
+  '0393fec19fe910667cf2d8cf1334f5e3771dc3b68f8fce64482256f5311bf28b'
+  '3c5fd7c50882c721f8db1a97d766db3b17ac79db92eeb00c820ffe9139a1544c'
+)
+
+prepare() {
+  cd "${pkgname%%-*}-$pkgver"
+
+  # Fix build with CMake 4+
+  # https://github.com/freeglut/freeglut/commit/2294389397912c9a6505a88221abb7dca0a4fb79.patch
+  patch -Np1 -i ../2294389397912c9a6505a88221abb7dca0a4fb79.patch
+
+
+  # Fix build with GCC 15+
+  # https://github.com/freeglut/freeglut/commit/800772e993a3ceffa01ccf3fca449d3279cde338
+  patch -Np1 -i ../800772e993a3ceffa01ccf3fca449d3279cde338.patch
+}
+
+build() {
+  local _cmake_args=(
+    -D CMAKE_BUILD_TYPE=Release
+    -B build -G Ninja
+  	-D CMAKE_BUILD_TYPE=None
+    -D CMAKE_INSTALL_PREFIX=/usr
+    -D CMAKE_INSTALL_LIBDIR=lib
+
+    -D FREEGLUT_BUILD_DEMOS=OFF
+    -D FREEGLUT_BUILD_SHARED_LIBS=ON
+    -D FREEGLUT_BUILD_STATIC_LIBS=OFF
+    -D FREEGLUT_GLES=OFF
+    -D FREEGLUT_WAYLAND=ON
+  )
+
+  cmake -S "${pkgname%%-*}-$pkgver" "${_cmake_args[@]}"
+  cmake --build build
+}
+
+check() {
+  ctest --test-dir build --output-on-failure --stop-on-failure -j$(nproc)
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+
+  ln -s glut.pc "$pkgdir/usr/lib/pkgconfig/freeglut.pc"
+
+  install -Dm644 -t "$pkgdir/usr/share/licenses/$pkgname" "${pkgname%%-*}-$pkgver/COPYING"
+}
