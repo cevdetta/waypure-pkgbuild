@@ -1,0 +1,40 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=xdg-utils-waypure
+pkgver=1.2.1
+pkgrel=1
+pkgdesc="Command line tools that assist applications with a variety of desktop integration tasks (Wayland only)"
+arch=('any')
+url="https://gitlab.freedesktop.org/xdg/xdg-utils"
+license=('MIT')
+depends=('sh' 'file')
+makedepends=('docbook-xsl' 'lynx' 'xmlto')
+optdepends=(
+  'gtk-update-icon-cache: xdg-icon-resource'
+  'xdg-desktop-icon: xdg-user-dir'
+  'xdg-desktop-menu: update-desktop-database'
+  'xdg-mime: update-mime-database'
+  'xdg-open: mimeopen, run-mailcap'
+  'xdg-screensaver: mv -T, org.freedesktop.ScreenSaver'
+)
+provides=('xdg-utils')
+conflicts=('xdg-utils')
+replaces=('xdg-utils')
+source=("$url/-/archive/v$pkgver/xdg-utils-v$pkgver.tar.gz")
+sha256sums=('f6b648c064464c2636884c05746e80428110a576f8daacf46ef2e554dcfdae75')
+
+build() {
+  cd "xdg-utils-v$pkgver"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "xdg-utils-v$pkgver"
+  DESTDIR="${pkgdir}" make install
+  install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+  # install empty directory to prevent xdg-desktop-menu install *.desktop to fail, see FS#33316
+  install -dm755 "$pkgdir"/usr/share/desktop-directories
+}
