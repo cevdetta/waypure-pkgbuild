@@ -1,0 +1,41 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=vulkan-tools-waypure
+pkgver=1.4.328.1
+pkgrel=1
+pkgdesc="Vulkan tools and utilities"
+arch=('x86_64')
+url="https://github.com/KhronosGroup/Vulkan-Tools"
+license=('Apache-2.0')
+depends=('gcc-libs' 'glibc' 'vulkan-icd-loader' 'wayland')
+makedepends=('cmake' 'ninja' 'volk' 'vulkan-headers' 'wayland-protocols')
+groups=('vulkan-devel')
+provides=('vulkan-tools')
+conflicts=('vulkan-tools')
+replaces=('vulkan-tools')
+source=("$url/archive/refs/tags/vulkan-sdk-$pkgver.tar.gz")
+sha256sums=('617e91b396ac771869d62cd131f05dcc0b82d038744dab7f575bcf213852f8bf')
+
+build() {
+  local _cmake_options=(
+    -D CMAKE_BUILD_TYPE=Release
+    -D CMAKE_INSTALL_PREFIX=/usr
+    -D CMAKE_INSTALL_SYSCONFDIR=/etc
+    -D CMAKE_SKIP_INSTALL_RPATH=ON
+    -D BUILD_CUBE=OFF
+    -D BUILD_ICD=OFF
+    -D BUILD_TESTS=OFF
+    -D BUILD_VULKANINFO=ON
+    -D BUILD_WERROR=ON
+    -D TOOLS_CODEGEN=OFF
+    -D ENABLE_ADDRESS_SANITIZER=OFF
+  )
+
+  cmake -S "Vulkan-Tools-vulkan-sdk-$pkgver" -B build -G Ninja "${_cmake_options[@]}"
+  cmake --build build
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+}
