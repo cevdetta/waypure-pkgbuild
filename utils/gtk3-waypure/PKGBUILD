@@ -1,0 +1,82 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgname=gtk3-waypure
+pkgver=3.24.51
+pkgrel=1
+pkgdesc="GObject-based multi-platform GUI toolkit (Wayland only)"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/gtk"
+license=('LGPL-2.1-or-later')
+depends=('adwaita-fonts' 'adwaita-icon-theme' 'at-spi2-core' 'cairo' 'dconf' 'fontconfig' 'fribidi' 'gdk-pixbuf2' 'glib2' 'glibc' 'gtk-update-icon-cache' 'harfbuzz' 'libepoxy' 'libcolord' 'libcups' 'libxkbcommon' 'pango' 'wayland')
+makedepends=('glib2-devel' 'meson' 'sassc' 'wayland-protocols')
+provides=('gtk3' 'gtk3-print-backends' 'libgailutil-3.so' 'libgdk-3.so' 'libgtk-3.so')
+conflicts=('gtk3' 'gtk3-print-backends')
+replaces=('gtk3' 'gtk3-print-backends')
+install=gtk3.install
+source=(
+  "$url/-/archive/$pkgver/gtk-$pkgver.tar.gz"
+  'gtk-query-immodules-3.0.hook'
+)
+sha256sums=(
+  'f3c87a20b3380b69efa720f412a0fea6ab6edce021f8ffaf5c4531fe1321b24f'
+  'a0319b6795410f06d38de1e8695a9bf9636ff2169f40701671580e60a108e229'
+)
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    --auto-features=disabled
+    -Dstrip=true
+    -Db_lto=true
+    -Db_ndebug=true
+
+    -Dx11_backend=false
+    -Dwayland_backend=true
+    -Dbroadway_backend=false
+    -Dwin32_backend=false
+    -Dquartz_backend=false
+
+    -Dxinerama=no
+    -Dcloudproviders=false
+    -Dprofiler=false
+    -Dtracker3=false
+
+    -Dprint_backends=auto
+    -Dcolord=yes
+
+    -Dgtk_doc=false
+    -Dman=false
+    -Dintrospection=false
+
+    -Ddemos=false
+    -Dexamples=false
+    -Dtests=false
+    -Dinstalled_tests=false
+
+    # -Dbuiltin_immodules=
+  )
+
+  arch-meson "gtk-$pkgver" build "${_meson_options[@]}"
+
+  meson compile -C build
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/gtk-3.0/settings.ini" <<END
+[Settings]
+gtk-icon-theme-name = Adwaita
+gtk-theme-name = Adwaita
+gtk-font-name = Adwaita Sans 11
+gtk-application-prefer-dark-theme = true
+END
+
+  install -Dm644 gtk-query-immodules-3.0.hook -t "$pkgdir/usr/share/libalpm/hooks"
+
+  cd "$pkgdir"
+
+  # Built by GTK 4, shared with GTK 3
+  rm usr/bin/gtk-update-icon-cache
+}
