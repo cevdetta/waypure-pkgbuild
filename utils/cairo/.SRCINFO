@@ -10,6 +10,7 @@ pkgbase = cairo-waypure
 	depends = fontconfig
 	depends = freetype2
 	depends = glib2
+	depends = glibc
 	depends = libpng
 	depends = lzo
 	depends = pixman
