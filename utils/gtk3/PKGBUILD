@@ -42,7 +42,7 @@ build() {
     -Dprofiler=false
     -Dtracker3=false
 
-    -Dprint_backends=auto
+    -Dprint_backends=cups,file,lpr
     -Dcolord=yes
 
     -Dgtk_doc=false
