@@ -13,8 +13,14 @@ makedepends=('mesa-libgl' 'meson')
 provides=('libepoxy' 'libepoxy.so')
 conflicts=('libepoxy')
 replaces=('libepoxy')
-source=("$url/archive/refs/tags/$pkgver.tar.gz")
-sha256sums=('a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15')
+source=("$url/archive/refs/tags/$pkgver.tar.gz"
+  'libepoxy-1.5.10-libopengl-fallback.patch')
+sha256sums=('a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15'
+  'a9e639f36676eba5b6896fd8022cbc3def18f2ef5bd380216530f5e8c1a5228c')
+
+prepare() {
+    patch -d "${pkgname%%-*}-$pkgver" -Np1 -i ../libepoxy-1.5.10-libopengl-fallback.patch
+}
 
 build() {
   local _meson_options=(
