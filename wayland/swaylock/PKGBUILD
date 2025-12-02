@@ -2,19 +2,19 @@
 # Contributor: cevdetta
 
 pkgname=swaylock-waypure
-pkgver=1.8.3
+pkgver=1.8.4
 pkgrel=1
 pkgdesc="Screen locker for Wayland"
 arch=('x86_64')
 url="https://github.com/swaywm/swaylock"
 license=('MIT')
-depends=('cairo' 'gdk-pixbuf2' 'glib2' 'libxkbcommon' 'pam' 'wayland')
+depends=('cairo' 'glibc' 'libxkbcommon' 'pam' 'wayland')
 makedepends=('meson' 'scdoc' 'wayland-protocols')
 provides=('swaylock')
 conflicts=('swaylock')
 replaces=('swaylock')
 source=("$url/releases/download/v$pkgver/${pkgname%%-*}-$pkgver.tar.gz")
-sha256sums=('c9edc022cefc84d5762df9e480eed16627776897def52d630c0348de53f04f94')
+sha256sums=('aa251d5a8f335fe2ac9ec3cc2a6ac8772aa4dba2ec710ccd415956c6e89b11d3')
 
 build() {
   local _meson_options=(
@@ -25,7 +25,7 @@ build() {
     -Db_ndebug=true
 
     -Dpam=enabled
-    -Dgdk-pixbuf=enabled
+    -Dgdk-pixbuf=disabled
     -Dman-pages=enabled
     -Dzsh-completions=false
     -Dbash-completions=true
