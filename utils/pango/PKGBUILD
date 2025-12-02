@@ -8,8 +8,8 @@ pkgdesc="A library for layout and rendering of text (Wayland only)"
 arch=('x86_64')
 url="https://gitlab.gnome.org/GNOME/pango"
 license=('LGPL-2.1-or-later')
-depends=('cairo' 'freetype2' 'fribidi' 'fontconfig' 'glib2' 'harfbuzz')
-makedepends=('glib2-devel' 'gobject-introspection' 'meson')
+depends=('cairo' 'freetype2' 'fribidi' 'fontconfig' 'glib2' 'glibc' 'harfbuzz')
+makedepends=('glib2-devel' 'meson')
 provides=('pango' 'libpango-1.0.so' 'libpangocairo-1.0.so' 'libpangoft2-1.0.so')
 conflicts=('pango')
 replaces=('pango')
@@ -26,7 +26,7 @@ build() {
 
     -Ddocumentation=false
     -Dman-pages=false
-    -Dintrospection=enabled
+    -Dintrospection=disabled
     -Dbuild-testsuite=false
     -Dbuild-examples=false
     -Dfontconfig=enabled
