@@ -8,7 +8,7 @@ pkgdesc="Tiling Wayland compositor without X and gdk-pixbuf"
 arch=('x86_64')
 url="https://github.com/swaywm/sway"
 license=('MIT')
-depends=('cairo' 'gdk-pixbuf2' 'glib2' 'json-c' 'libdrm' 'libevdev' 'libinput' 'libxkbcommon' 'pango' 'pcre2' 'pixman' 'systemd-libs' 'wayland' 'wlroots0.19')
+depends=('cairo' 'glib2' 'glibc' 'json-c' 'libdrm' 'libevdev' 'libinput' 'libxkbcommon' 'pango' 'pcre2' 'pixman' 'systemd-libs' 'wayland' 'wlroots0.19')
 makedepends=('meson' 'scdoc' 'wayland-protocols')
 optdepends=(
   'brightnessctl: Brightness adjustment tool used in the default configuration'
@@ -41,7 +41,7 @@ source=(
 )
 sha256sums=(
   '0e37a55b7c3379230e97e1ad982542b75016a0c7d6676198604e557f9b373dae'
-  'c7871e84042d0e698e2274c8bb9fbfad8225ede90b33830de106442d09e2acc4'
+  '0b912b99055b30a2ea062f2995aaf161348829470dbe5ce9415f608ca7255316'
   'd7c031d0c49c116f503d2ad45471741d2730bbbb6ac945f89c15650f1701ff57'
 )
 
@@ -60,9 +60,9 @@ build() {
     -Dbash-completions=true
     -Dfish-completions=false
     -Dswaybar=true
-    -Dswaynag=true
+    -Dswaynag=false
     -Dtray=enabled
-    -Dgdk-pixbuf=enabled
+    -Dgdk-pixbuf=disabled
     -Dman-pages=enabled
     -Dsd-bus-provider=libsystemd
   )
