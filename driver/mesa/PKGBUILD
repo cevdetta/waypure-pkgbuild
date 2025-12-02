@@ -1,0 +1,334 @@
+# Maintainer: cevdetta
+# Contributor: cevdetta
+
+pkgbase=mesa-waypure
+pkgname=(
+  mesa-waypure
+  opencl-mesa-waypure
+  vulkan-radeon-waypure
+)
+pkgver=25.3.0
+pkgrel=1
+pkgdesc="Open-source OpenGL drivers"
+arch=('x86_64')
+url="https://gitlab.freedesktop.org/mesa/mesa"
+license=('MIT AND BSD-3-Clause AND SGI-B-2.0')
+depends=()
+makedepends=(
+    clang
+    expat
+    gcc-libs
+    glibc
+    libdrm
+    libelf
+    libglvnd
+    libpng
+    libva
+    llvm
+    llvm-libs
+    lm_sensors
+    rust
+    spirv-llvm-translator
+    spirv-tools
+    systemd-libs
+    vulkan-icd-loader
+    wayland
+    zlib
+    zstd
+
+    # shared between mesa and lib32-mesa
+    cbindgen
+    clang
+    cmake
+    elfutils
+    glslang
+    libclc
+    meson
+    python-mako
+    python-packaging
+    python-ply
+    python-yaml
+    rust-bindgen
+    wayland-protocols
+)
+# optdepends=()
+provides=('mesa')
+conflicts=('mesa')
+replaces=('mesa')
+source=("https://archive.mesa3d.org/mesa-$pkgver.tar.xz")
+sha256sums=('SKIP')
+
+# prepare() {
+#   cd mesa-$pkgver
+
+#   local src
+#   for src in "${source[@]}"; do
+#     src="${src%%::*}"
+#     src="${src##*/}"
+#     src="${src%.zst}"
+#     [[ $src = *.patch ]] || continue
+#     echo "Applying patch $src..."
+#     patch -Np1 < "../$src"
+#   done
+
+#   # Include package release in version string so Chromium invalidates
+#   # its GPU cache; otherwise it can cause pages to render incorrectly.
+#   # https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/2020604
+#   echo "$pkgver-arch$epoch.$pkgrel" >VERSION
+# }
+
+_pick() {
+  local p="$1" f d; shift
+  for f; do
+    d="$srcdir/$p/${f#$pkgdir/}"
+    mkdir -p "$(dirname "$d")"
+    mv -v "$f" "$d"
+    rmdir -p --ignore-fail-on-non-empty "$(dirname "$f")"
+  done
+}
+
+build() {
+  local _meson_options=(
+    --buildtype=release
+    # --auto-features=disabled
+
+    -D strip=true
+    -D b_lto=true
+    -D b_lto_mode=default
+    -D b_ndebug=true
+
+    -D split-debug=disabled
+
+    -D platforms=wayland
+    -D egl-native-platform=wayland #wayland/drm
+
+    -D android-stub=false
+    -D android-strict=false
+    -D android-libbacktrace=disabled
+    -D android-libperfetto=disabled
+
+    #-D dri-drivers-path='$libdir/dri'
+    #-D unversion-libgallium=false
+    #-D expat=auto
+    -D gallium-drivers=radeonsi,llvmpipe,virgl
+    #-D gallium-extra-hud=false #true
+    -D gallium-va=enabled
+    -D gallium-mediafoundation=disabled
+    -D gallium-mediafoundation-test=false
+    #-D va-libs-path='$libdir/dri'
+    -D gallium-d3d10umd=false
+    -D gallium-rusticl=true
+    -D gallium-rusticl-enable-drivers=radeonsi
+    #-D gallium-wgl-dll-name='libgallium_wgl'
+    #-D gallium-d3d10-dll-name='libgallium_d3d10'
+    -D mediafoundation-store-dll=false
+    #-D mediafoundation-codecs=all
+    #-D static-libclc=spirv,spirv64,all
+    #-D d3d-drivers-path='$libdir/d3d'
+    -D vulkan-drivers=amd
+    # -D freedreno-kmds=virtio
+    -D amdgpu-virtio=true
+    #-D imagination-srv=false
+    #-D imagination-uscgen-devices=
+    #-D shader-cache=enabled
+    #-D shader-cache-default=true
+    #-D shader-cache-max-size='1G'
+    #-D vulkan-icd-dir='$datadir/vulkan/icd.d'
+    #-D vulkan-manifest-per-architecture=true
+    #-D moltenvk-dir=''
+    #-D vulkan-layers=anti-lag,device-select,overlay,screenshot,vram-report-limit
+    #-D shared-glapi=
+    -D gles1=disabled
+    -D gles2=enabled
+    -D opengl=true
+    -D gbm=enabled
+    #-D libgbm-external=false
+    #-D gbm-backends-path='$libdir/gbm'
+    -D glx=disabled
+    -D egl=enabled
+    # -D glvnd=enabled
+    -D microsoft-clc=disabled
+    #-D spirv-to-dxil=false
+    #-D glvnd-vendor-name='mesa'
+    #-D glx-read-only-text=false
+    -D llvm=enabled
+    -D shared-llvm=enabled
+    -D draw-use-llvm=true
+    -D amd-use-llvm=true
+    #-D llvm-orcjit=false
+    -D valgrind=disabled
+    -D libunwind=disabled
+    #-D lmsensors=
+    -D build-tests=false
+    -D enable-glcpp-tests=false
+    -D build-radv-tests=false
+    -D build-aco-tests=false
+    -D install-intel-gpu-tests=false
+    -D html-docs=disabled
+    #-D html-docs-path='$datadir/doc/mesa'
+    #-D selinux=true
+    #-D execmem=true
+    # -D tools=glsl,nir,zink,dlclose-skip
+    #-D power8=
+    -D xlib-lease=disabled
+    #-D glx-direct=true
+    #-D egl-lib-suffix=''
+    #-D gles-lib-suffix=''
+    #-D platform-sdk-version=34
+    #-D allow-kcmp=auto
+    -D zstd=enabled
+    -D zlib=enabled
+    # -D display-info=enabled
+    -D sse2=true
+    -D perfetto=false
+    #-D datasources=auto
+    -D teflon=false
+    -D gpuvis=false
+    -D sysprof=false
+    #-D custom-shader-replacement=''
+    #-D vmware-mks-stats=false
+    #-D vulkan-beta=false
+    -D intel-rt=disabled
+    -D intel-elk=false
+    -D video-codecs=all
+    -D gallium-d3d12-video=disabled
+    -D gallium-d3d12-graphics=disabled
+    #-D radv-build-id=''
+    #-D radeonsi-build-id=''
+    #-D min-windows-version=11
+    #-D xmlconfig=auto
+    #-D legacy-wayland=['bind-wayland-display]
+    #-D legacy-x11=[]
+    #-D mesa-clc=auto
+    #-D install-mesa-clc=false
+    #-D mesa-clc-bundle-headers=auto
+    #-D precomp-compiler=auto
+    #-D install-precomp-compiler=false
+    # -D allow-fallback-for=libdrm,libva
+    #-D virtgpu_kumquat=false
+    #-D spirv-tools=
+  )
+
+  # Build only minimal debug info to reduce size
+  CFLAGS+=" -g1"
+  CXXFLAGS+=" -g1"
+
+  # Inject subproject packages
+  export MESON_PACKAGE_CACHE_DIR="$srcdir"
+
+  arch-meson "${pkgname%%-*}-$pkgver" build "${_meson_options[@]}"
+  meson compile -C build
+}
+
+package_mesa-waypure() {
+  depends=(
+    expat
+    gcc-libs
+    glibc
+    libdrm
+    libelf
+    libglvnd
+    llvm-libs
+    lm_sensors
+    spirv-tools
+    wayland
+    zlib
+    zstd
+  )
+  optdepends=("opengl-man-pages: for the OpenGL API man pages")
+  provides=(
+    'mesa'
+    "libva-mesa-driver=$pkgver-$pkgrel"
+    "mesa-libgl=$pkgver-$pkgrel"
+    libva-driver
+    opengl-driver
+  )
+  conflicts=(
+    'mesa'
+    'libva-mesa-driver<1:24.2.7-1'
+    'mesa-libgl<17.0.1-2'
+  )
+  replaces=(
+    'mesa'
+    'libva-mesa-driver<1:24.2.7-1'
+    'mesa-libgl<17.0.1-2'
+  )
+
+  meson install -C build --destdir "$pkgdir" --no-rebuild
+
+  (
+    local libdir=usr/lib icddir=usr/share/vulkan/icd.d
+
+    cd "$pkgdir"
+
+    _pick opencl $libdir/libRusticlOpenCL*
+    _pick opencl etc/OpenCL/vendors/rusticl.icd
+
+    _pick vkradeon $icddir/radeon_icd.*.json
+    _pick vkradeon $libdir/libvulkan_radeon.so
+    _pick vkradeon usr/share/drirc.d/00-radv-defaults.conf
+  )
+
+  install -Dm644 mesa-$pkgver/docs/license.rst -t "$pkgdir/usr/share/licenses/$pkgname"
+}
+
+package_opencl-mesa-waypure() {
+  pkgdesc="Open-source OpenCL drivers"
+  depends=(
+    clang
+    expat
+    gcc-libs
+    glibc
+    libdrm
+    libelf
+    llvm-libs
+    spirv-llvm-translator
+    spirv-tools
+    zlib
+    zstd
+
+    libclc # For /usr/share/clc/
+  )
+  optdepends=("opencl-headers: headers necessary for OpenCL development")
+  provides=('opencl-mesa' opencl-driver)
+  replaces=(
+    'opencl-mesa'
+    "opencl-clover-mesa<=1:25.0.5-1"
+    "opencl-rusticl-mesa<=1:25.0.5-1"
+  )
+  conflicts=(
+    'opencl-mesa'
+    opencl-clover-mesa
+    opencl-rusticl-mesa
+  )
+
+  mv opencl/* "$pkgdir"
+
+  install -Dm644 mesa-$pkgver/docs/license.rst -t "$pkgdir/usr/share/licenses/$pkgname"
+}
+
+package_vulkan-radeon-waypure() {
+  pkgdesc="Open-source Vulkan driver for AMD GPUs"
+  depends=(
+    expat
+    gcc-libs
+    glibc
+    libdrm
+    libdisplay-info
+    libelf
+    llvm-libs
+    spirv-tools
+    systemd-libs
+    wayland
+    zlib
+    zstd
+  )
+  optdepends=("vulkan-mesa-layers: additional vulkan layers")
+  provides=('vulkan-radeon' 'vulkan-driver')
+  replaces=('vulkan-radeon')
+  conflicts=('vulkan-radeon')
+
+  mv vkradeon/* "$pkgdir"
+
+  install -Dm644 mesa-$pkgver/docs/license.rst -t "$pkgdir/usr/share/licenses/$pkgname"
+}
