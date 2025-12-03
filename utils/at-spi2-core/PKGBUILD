@@ -2,19 +2,19 @@
 # Contributor: cevdetta
 
 pkgname=at-spi2-core-waypure
-pkgver=2.58.1
+pkgver=2.58.2
 pkgrel=1
 pkgdesc="Protocol definitions and daemon for D-Bus at-spi (Wayland only)"
 arch=('x86_64')
 url="https://gitlab.gnome.org/GNOME/at-spi2-core"
 license=('LGPL-2.1-or-later')
-depends=('dbus' 'gcc-libs' 'glib2' 'systemd-libs')
+depends=('dbus' 'gcc-libs' 'glib2' 'glibc' 'systemd-libs')
 makedepends=('glib2-devel' 'meson' 'systemd')
 provides=('at-spi2-core' 'libatk-1.0.so' 'libatk-bridge-2.0.so' 'libatspi.so')
 conflicts=('at-spi2-core')
 replaces=('at-spi2-core')
 source=("$url/-/archive/$pkgver/at-spi2-core-$pkgver.tar.gz")
-sha256sums=('780544354db3f6b3e4cc0c6dcdf3bfbaac93970a7a1e7e659f24c7308e2b0a1a')
+sha256sums=('b68f4ccea0a7fdbaf6b0cb3f151906fc060cc000c64d60b621679a29d79d8bb5')
 
 build() {
   local _meson_options=(
